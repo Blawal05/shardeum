@@ -7031,6 +7031,12 @@ const shardusSetup = (): void => {
         return
       }
 
+      // skip if cachedNetworkAccount is not available
+      if (!AccountsStorage.cachedNetworkAccount) {
+        if (ShardeumFlags.VerboseLogs) console.log(`cachedNetworkAccount is undefined`)
+        return
+      }
+
       // We can skip staking related txs for the first node
       if (shardus.p2p.isFirstSeed) {
         //only skip events for our node, test redundant now
@@ -7061,7 +7067,7 @@ const shardusSetup = (): void => {
       const currentlyActivatedNode = currentCycle.activated.includes(nodeId)
       if (currentlyActivatedNode) return
 
-      if (eventType === 'node-activated' && AccountsStorage.cachedNetworkAccount?.current.utilityFlags.enableRewardTXs) {
+      if (eventType === 'node-activated' && AccountsStorage.cachedNetworkAccount.current.utilityFlags.enableRewardTXs) {
         const activeNodesCount = currentCycle.active
         const stakingEnabled = activeNodesCount >= ShardeumFlags.minActiveNodesForStaking
         // Skip initRewardTimes if activeNodesCount is less than minActiveNodesForStaking
@@ -7080,7 +7086,7 @@ const shardusSetup = (): void => {
             /* prettier-ignore */ if (logFlags.dapp_verbose) console.log('INJECTED_INIT_REWARD_TIMES_TX', result)
           }
         }
-      } else if (eventType === 'node-deactivated' && AccountsStorage.cachedNetworkAccount?.current.utilityFlags.enableRewardTXs) {
+      } else if (eventType === 'node-deactivated' && AccountsStorage.cachedNetworkAccount.current.utilityFlags.enableRewardTXs) {
         // todo: aamir check the timestamp and cycle the first time we see this event
         nestedCountersInstance.countEvent('shardeum-staking', `node-deactivated: injectClaimRewardTx`)
 
